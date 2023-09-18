@@ -1,4 +1,3 @@
-from pprint import pprint
 import csv
 import re
 
@@ -6,7 +5,8 @@ with open("phonebook_raw.csv", "r", encoding="utf-8") as f:
     rows = csv.reader(f, delimiter=",")
     contacts_list = list(rows)
     redact_list = []
-# pprint(contacts_list)
+    contact_red_list = []
+    redact_list_1 = []
 
 def names_change():
     pattern_name = r'([А-Я])'
@@ -36,8 +36,6 @@ def formatting_phones():
     return
 
 def editing_list():
-    names_list = []
-    info_list = []
     for i in contacts_list[1:]:
         first_name = i[0]
         last_name = i[1]
@@ -58,13 +56,35 @@ def editing_list():
     for sublist in contacts_list:
         if sublist not in redact_list:
             redact_list.append(sublist)
-    # pprint(redact_list)
     return
+
+def double(redact_list):
+    for line in redact_list:
+        contact_red_list.append(line[:7])
+    for sublist in contact_red_list:
+        if sublist not in redact_list_1:
+            redact_list_1.append(sublist)
+    return
+def add_entry(entry):
+    dictionary = {}
+    key = entry['f'] + entry['i']
+    if key in dictionary:
+        existing_entry = dictionary[key]
+        for field in entry:
+            if field in existing_entry:
+                existing_entry[field] += entry[field]
+            else:
+                existing_entry[field] = entry[field]
+    else:
+        dictionary[key] = entry
+
+
 
 if __name__ == '__main__':
     names_change()
     formatting_phones()
     editing_list()
+    double(redact_list)
     with open("phonebook.csv", "w", encoding="utf-8") as f:
         datawriter = csv.writer(f, delimiter=',')
-        datawriter.writerows(redact_list)
+        datawriter.writerows(redact_list_1)
